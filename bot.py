@@ -53,3 +53,31 @@ def main():
 
 if __name__ == "__main__":
     main()
+def start(update: Update, context: CallbackContext):
+    user = update.effective_user
+    chat_id = update.effective_chat.id
+
+    not_subscribed = []
+
+    for channel in CHANNELS:
+        try:
+            member = context.bot.get_chat_member(channel, user.id)
+            # Agar foydalanuvchi kanalga obuna bo'lmagan bo'lsa
+            if member.status in ["left", "kicked"]:
+                not_subscribed.append(channel)
+        except:
+            update.message.reply_text(f"{channel} tekshirishda xatolik yuz berdi.")
+            return
+
+    if not_subscribed:
+        # Agar biror kanalga obuna bo'lmagan bo'lsa
+        update.message.reply_text(
+            "❌ Iltimos, quyidagi kanallarga obuna bo‘ling:\n" +
+            "\n".join(not_subscribed)
+        )
+        return
+
+    # Agar foydalanuvchi hamma kanallarga obuna bo'lsa
+    update.message.reply_text(
+        "✅ Siz barcha kanallarga obuna bo‘ldingiz! Endi matn yuboring, men uni ovozga aylantiraman."
+    )
